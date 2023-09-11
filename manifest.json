@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "asdf",
+  "version": "1.0",
+  "description": "asdf",
+  "action": {},
+  "background": {
+    "service_worker": "src/background.ts",
+    "type": "module"
+  },
+  "permissions": ["activeTab", "scripting"]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "asdf",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "beta",
+    "chrome-types": "^0.1.231",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^8.0.2",
+    "@testing-library/dom": "^9.3.1",
+    "@testing-library/user-event": "^14.4.3",
+    "ts-pattern": "^5.0.5"
+  }
+}
