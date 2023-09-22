@@ -13,9 +13,9 @@ export const Pselector = (selector: string) =>
     input.matches(selector)
   );
 
-export const ensure = <T>(reference: T | null | undefined, message?: string): T => {
-  if (reference === null || reference === undefined) {
-    throw new Error(message || 'Value cannot be null or undefined.');
+export const ensure = <T>(value: T | null | undefined, message?: string): T => {
+  if (!value) {
+    throw new Error(message || 'value is required');
   }
-  return reference;
+  return value;
 };
