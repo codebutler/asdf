@@ -1,10 +1,10 @@
 # asdf
 
-## What
-
 A chrome browser extension for web development that automatically fill forms with random data. Slightly better than mashing your keyboard.
 
-## How
+[![Install from Chrome Web Store](https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/iNEddTyWiMfLSwFD6qGq.png)](https://chrome.google.com/webstore/detail/mkoahfnpknkpobhmgocjnhhplpcjfjba)
+
+## Contribute
 
 1. Install [bun](https://bun.sh/)
 2. Install project dependencies: `bun install`
@@ -13,6 +13,6 @@ A chrome browser extension for web development that automatically fill forms wit
 5. Enable "Developer mode"
 6. Click "Load Unpacked" and select the newly created **dist** folder
 
-## Who
+## Credits
 
 Created by Eric Butler <eric@codebutler.com> [X@codebutler](https://x.com/@codebutler) [Threads@codebutler](https://threads.net/@codebutler)
