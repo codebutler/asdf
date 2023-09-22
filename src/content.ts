@@ -164,7 +164,6 @@ const fillInput = async (input: HTMLInputElement) => {
         .with(Pselector("[name*=city]"), (input) =>
           userEvent.type(input, faker.location.city()),
         )
-
         .otherwise((input) =>
           userEvent.type(
             input,
