@@ -5,19 +5,20 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "rm -rf dist && tsc && vite build && zip -r asdf.zip dist",
     "preview": "vite preview"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "beta",
     "chrome-types": "^0.1.231",
-    "typescript": "^5.0.2",
-    "vite": "^4.4.5"
+    "prettier": "^3.0.3",
+    "typescript": "^5.2.2",
+    "vite": "^4.4.9"
   },
   "dependencies": {
-    "@faker-js/faker": "^8.0.2",
-    "@testing-library/dom": "^9.3.1",
-    "@testing-library/user-event": "^14.4.3",
+    "@faker-js/faker": "^8.1.0",
+    "@testing-library/dom": "^9.3.3",
+    "@testing-library/user-event": "^14.5.1",
     "ts-pattern": "^5.0.5"
   }
 }
