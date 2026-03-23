@@ -9,13 +9,11 @@ export function difference<T>(setA: Set<T>, setB: Set<T>) {
 }
 
 export const Pselector = (selector: string) =>
-  P.when<HTMLElement, (input: HTMLElement) => boolean>((input) =>
-    input.matches(selector)
-  );
+  P.when<HTMLElement, (input: HTMLElement) => boolean>((input) => input.matches(selector));
 
 export const ensure = <T>(value: T | null | undefined, message?: string): T => {
   if (!value) {
-    throw new Error(message || 'value is required');
+    throw new Error(message || "value is required");
   }
   return value;
 };

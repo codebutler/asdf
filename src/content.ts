@@ -19,9 +19,7 @@ const fillElements = async () => {
   let passCount = 0;
 
   const fillUnseenElements = async () => {
-    const allElements = new Set(
-      document.querySelectorAll<FormElement>(FORM_ELEMENT_SELECTOR),
-    );
+    const allElements = new Set(document.querySelectorAll<FormElement>(FORM_ELEMENT_SELECTOR));
     const newElements = difference(allElements, seenElements);
     if (newElements.size === 0) {
       return;
@@ -62,7 +60,7 @@ const fillInput = async (input: HTMLInputElement) => {
       }
     })
     .with(Pselector("[type=color]"), (input) =>
-      userEvent.type(input, faker.internet.color()),
+      userEvent.type(input, faker.color.rgb({ format: "hex" })),
     )
     .with(Pselector("[type=date], [type=datetime-local]"), (input) =>
       userEvent.type(
@@ -70,12 +68,8 @@ const fillInput = async (input: HTMLInputElement) => {
         new Intl.DateTimeFormat(navigator.language).format(faker.date.future()),
       ),
     )
-    .with(Pselector("[type=email]"), (input) =>
-      userEvent.type(input, faker.internet.email()),
-    )
-    .with(Pselector("[type=month]"), (input) =>
-      userEvent.type(input, faker.date.month()),
-    )
+    .with(Pselector("[type=email]"), (input) => userEvent.type(input, faker.internet.email()))
+    .with(Pselector("[type=month]"), (input) => userEvent.type(input, faker.date.month()))
     .with(Pselector("[type=number]"), (input) =>
       userEvent.type(
         input,
@@ -87,20 +81,12 @@ const fillInput = async (input: HTMLInputElement) => {
           .toString(),
       ),
     )
-    .with(Pselector("[type=password]"), (input) =>
-      userEvent.type(input, faker.internet.password()),
-    )
+    .with(Pselector("[type=password]"), (input) => userEvent.type(input, faker.internet.password()))
     .with(Pselector("[type=radio]"), async (input) => {
-      const allOptions = document.querySelectorAll<HTMLInputElement>(
-        `input[name="${input.name}"]`,
-      );
-      const isAnyOptionChecked = Array.from(allOptions).some(
-        (option) => option.checked,
-      );
+      const allOptions = document.querySelectorAll<HTMLInputElement>(`input[name="${input.name}"]`);
+      const isAnyOptionChecked = Array.from(allOptions).some((option) => option.checked);
       if (!isAnyOptionChecked) {
-        await userEvent.click(
-          faker.helpers.arrayElement(Array.from(allOptions)),
-        );
+        await userEvent.click(faker.helpers.arrayElement(Array.from(allOptions)));
       }
     })
     .with(Pselector("[type=range]"), (input) =>
@@ -125,17 +111,13 @@ const fillInput = async (input: HTMLInputElement) => {
           .slice(0, -1),
       ),
     )
-    .with(Pselector("[type=tel]"), (input) =>
-      userEvent.type(input, faker.phone.number()),
-    )
+    .with(Pselector("[type=tel]"), (input) => userEvent.type(input, faker.phone.number()))
     .with(Pselector("input[type=text]"), (input) =>
       match(input)
         .with(Pselector("[data-input-type=date]"), (input) =>
           userEvent.type(
             input,
-            new Intl.DateTimeFormat(navigator.language).format(
-              faker.date.future(),
-            ),
+            new Intl.DateTimeFormat(navigator.language).format(faker.date.future()),
           ),
         )
         .with(Pselector("[inputmode=decimal], [inputmode=numeric]"), (input) =>
@@ -161,9 +143,7 @@ const fillInput = async (input: HTMLInputElement) => {
         .with(Pselector("[name*=address]"), (input) =>
           userEvent.type(input, faker.location.street()),
         )
-        .with(Pselector("[name*=city]"), (input) =>
-          userEvent.type(input, faker.location.city()),
-        )
+        .with(Pselector("[name*=city]"), (input) => userEvent.type(input, faker.location.city()))
         .otherwise((input) =>
           userEvent.type(
             input,
@@ -185,9 +165,7 @@ const fillInput = async (input: HTMLInputElement) => {
         }),
       ),
     )
-    .with(Pselector("input[type=url]"), (input) =>
-      userEvent.type(input, faker.internet.url()),
-    )
+    .with(Pselector("input[type=url]"), (input) => userEvent.type(input, faker.internet.url()))
     .with(Pselector("input[type=week]"), () => null) // FIXME
     .otherwise(() => null);
 };
@@ -216,10 +194,7 @@ const fillCombobox = async (input: HTMLInputElement) => {
   });
 
   await waitFor(() =>
-    ensure(
-      input.getAttribute("aria-expanded") === "true",
-      "combobox not expanded",
-    ),
+    ensure(input.getAttribute("aria-expanded") === "true", "combobox not expanded"),
   );
 
   const listboxId = await waitFor(() =>
@@ -244,8 +219,7 @@ const fillCombobox = async (input: HTMLInputElement) => {
 const shouldSkipElement = (elem: FormElement) => {
   const isInput = elem instanceof HTMLInputElement;
   const isRadio = isInput && elem.type === "radio";
-  const isInputOrTextArea =
-    elem instanceof HTMLInputElement || elem instanceof HTMLTextAreaElement;
+  const isInputOrTextArea = elem instanceof HTMLInputElement || elem instanceof HTMLTextAreaElement;
   return (
     !elem.checkVisibility() ||
     elem.disabled ||
