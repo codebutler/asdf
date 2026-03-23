@@ -15,4 +15,4 @@ A chrome browser extension for web development that automatically fill forms wit
 
 ## Credits
 
-Created by Eric Butler <eric@codebutler.com> [X@codebutler](https://x.com/@codebutler) [Threads@codebutler](https://threads.net/@codebutler)
+Created by Eric Butler <eric@codebutler.com> [X@codebutler](https://x.com/@codebutler)

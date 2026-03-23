@@ -17,3 +17,14 @@ export const ensure = <T>(value: T | null | undefined, message?: string): T => {
   }
   return value;
 };
+
+export function getAutocompleteToken(element: HTMLElement): string | null {
+  const autocomplete = element.getAttribute("autocomplete");
+  if (!autocomplete || autocomplete === "on" || autocomplete === "off") return null;
+  const tokens = autocomplete.trim().split(/\s+/);
+  let fieldToken = tokens[tokens.length - 1];
+  if (fieldToken === "webauthn" && tokens.length > 1) {
+    fieldToken = tokens[tokens.length - 2];
+  }
+  return fieldToken;
+}

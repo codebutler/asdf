@@ -1,12 +1,72 @@
 import { faker } from "@faker-js/faker";
 import userEvent from "@testing-library/user-event";
-import { difference, ensure, Pselector } from "./util";
+import { difference, ensure, getAutocompleteToken, Pselector } from "./util";
 import { match, P } from "ts-pattern";
 import { fireEvent, waitFor } from "@testing-library/dom";
 
 const FORM_ELEMENT_SELECTOR = "input, select, textarea, *[role=combobox]";
 
 type FormElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+
+const autocompleteGenerators: Record<string, () => string> = {
+  "name": () => faker.person.fullName(),
+  "honorific-prefix": () => faker.person.prefix(),
+  "given-name": () => faker.person.firstName(),
+  "additional-name": () => faker.person.firstName(),
+  "family-name": () => faker.person.lastName(),
+  "honorific-suffix": () => faker.person.suffix(),
+  "nickname": () => faker.internet.username(),
+  "username": () => faker.internet.username(),
+  "new-password": () => faker.internet.password(),
+  "current-password": () => faker.internet.password(),
+  "one-time-code": () => faker.string.numeric(6),
+  "email": () => faker.internet.email(),
+  "impp": () => faker.internet.url(),
+  "tel": () => faker.phone.number({ style: "national" }),
+  "tel-country-code": () => "+1",
+  "tel-national": () => faker.phone.number({ style: "national" }),
+  "tel-area-code": () => faker.string.numeric(3),
+  "tel-local": () => faker.string.numeric(7),
+  "tel-local-prefix": () => faker.string.numeric(3),
+  "tel-local-suffix": () => faker.string.numeric(4),
+  "tel-extension": () => faker.string.numeric(4),
+  "street-address": () => faker.location.streetAddress(),
+  "address-line1": () => faker.location.streetAddress(),
+  "address-line2": () => faker.location.secondaryAddress(),
+  "address-line3": () => faker.location.secondaryAddress(),
+  "address-level1": () => faker.location.state(),
+  "address-level2": () => faker.location.city(),
+  "address-level3": () => faker.location.county(),
+  "address-level4": () => faker.location.city(),
+  "postal-code": () => faker.location.zipCode("#####"),
+  "country": () => faker.location.countryCode(),
+  "country-name": () => faker.location.country(),
+  "cc-name": () => faker.person.fullName(),
+  "cc-given-name": () => faker.person.firstName(),
+  "cc-additional-name": () => faker.person.firstName(),
+  "cc-family-name": () => faker.person.lastName(),
+  "cc-number": () => faker.finance.creditCardNumber(),
+  "cc-exp": () => {
+    const future = faker.date.future();
+    return `${String(future.getMonth() + 1).padStart(2, "0")}/${String(future.getFullYear()).slice(-2)}`;
+  },
+  "cc-exp-month": () => String(faker.number.int({ min: 1, max: 12 })).padStart(2, "0"),
+  "cc-exp-year": () => String(faker.date.future().getFullYear()),
+  "cc-csc": () => faker.finance.creditCardCVV(),
+  "cc-type": () => faker.finance.creditCardIssuer(),
+  "organization": () => faker.company.name(),
+  "organization-title": () => faker.person.jobTitle(),
+  "bday": () => new Intl.DateTimeFormat(navigator.language).format(faker.date.birthdate()),
+  "bday-day": () => String(faker.number.int({ min: 1, max: 31 })),
+  "bday-month": () => String(faker.number.int({ min: 1, max: 12 })),
+  "bday-year": () => String(faker.number.int({ min: 1940, max: 2005 })),
+  "sex": () => faker.person.sex(),
+  "language": () => faker.helpers.arrayElement(["en", "es", "fr", "de", "it", "pt", "ja", "zh", "ko", "ar"]),
+  "url": () => faker.internet.url(),
+  "photo": () => faker.image.avatar(),
+  "transaction-currency": () => faker.finance.currencyCode(),
+  "transaction-amount": () => String(faker.finance.amount()),
+};
 
 export const onExecute = async () => {
   await fillElements();
@@ -53,6 +113,13 @@ const fillElements = async () => {
 
 const fillInput = async (input: HTMLInputElement) => {
   input.select();
+  if (!input.getAttribute("type") || input.type === "text") {
+    const token = getAutocompleteToken(input);
+    if (token && token in autocompleteGenerators) {
+      await userEvent.type(input, autocompleteGenerators[token]());
+      return;
+    }
+  }
   await match(input)
     .with(Pselector("[type=checkbox]"), async (input) => {
       if (faker.datatype.boolean()) {
@@ -111,7 +178,9 @@ const fillInput = async (input: HTMLInputElement) => {
           .slice(0, -1),
       ),
     )
-    .with(Pselector("[type=tel]"), (input) => userEvent.type(input, faker.phone.number()))
+    .with(Pselector("[type=tel]"), (input) =>
+      userEvent.type(input, faker.phone.number({ style: "national" })),
+    )
     .with(Pselector("input[type=text]"), (input) =>
       match(input)
         .with(Pselector("[data-input-type=date]"), (input) =>
@@ -131,19 +200,19 @@ const fillInput = async (input: HTMLInputElement) => {
               .toString(),
           ),
         )
-        .with(Pselector("[name*=first_name]"), (input) =>
+        .with(Pselector("[name*=first_name], [id*=first_name]"), (input) =>
           userEvent.type(input, faker.person.firstName()),
         )
-        .with(Pselector("[name*=last_name]"), (input) =>
+        .with(Pselector("[name*=last_name], [id*=last_name]"), (input) =>
           userEvent.type(input, faker.person.lastName()),
         )
-        .with(Pselector("[name*=full_name]"), (input) =>
+        .with(Pselector("[name*=full_name], [id*=full_name]"), (input) =>
           userEvent.type(input, faker.person.fullName()),
         )
-        .with(Pselector("[name*=address]"), (input) =>
+        .with(Pselector("[name*=address], [id*=address]"), (input) =>
           userEvent.type(input, faker.location.street()),
         )
-        .with(Pselector("[name*=city]"), (input) => userEvent.type(input, faker.location.city()))
+        .with(Pselector("[name*=city], [id*=city]"), (input) => userEvent.type(input, faker.location.city()))
         .otherwise((input) =>
           userEvent.type(
             input,
@@ -181,6 +250,11 @@ const fillSelect = async (select: HTMLSelectElement) => {
 };
 
 const fillTextArea = async (textarea: HTMLTextAreaElement) => {
+  const token = getAutocompleteToken(textarea);
+  if (token && token in autocompleteGenerators) {
+    await userEvent.type(textarea, autocompleteGenerators[token]());
+    return;
+  }
   await userEvent.type(textarea, faker.lorem.paragraph());
 };
 
