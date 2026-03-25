@@ -21,6 +21,9 @@
         font-size: 13px;
         box-sizing: border-box;
       }
+      .field {
+        margin-bottom: 12px;
+      }
       .hint {
         font-size: 11px;
         color: #888;
@@ -36,9 +39,23 @@
     </style>
   </head>
   <body>
-    <label for="email">Override email</label>
-    <input type="email" id="email" placeholder="Leave blank to use Chrome profile email" />
-    <div class="hint">Plus-addressed timestamps will be added automatically.</div>
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Chrome profile email" />
+      <div class="hint">Plus-addressed timestamps will be added automatically.</div>
+    </div>
+    <div class="field">
+      <label for="firstName">First name</label>
+      <input type="text" id="firstName" placeholder="Random" />
+    </div>
+    <div class="field">
+      <label for="lastName">Last name</label>
+      <input type="text" id="lastName" placeholder="Random" />
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="text" id="password" placeholder="Random" />
+    </div>
     <div class="status" id="status">Saved</div>
     <script type="module" src="options.ts"></script>
   </body>

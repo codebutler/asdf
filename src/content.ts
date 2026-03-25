@@ -8,26 +8,41 @@ const FORM_ELEMENT_SELECTOR = "input, select, textarea, *[role=combobox]";
 
 type FormElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
-let profileEmail: string | null = null;
+type Overrides = {
+  email?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  password?: string | null;
+};
+
+let overrides: Overrides = {};
 
 const generateEmail = (): string => {
-  if (!profileEmail) return faker.internet.email();
-  const [local, domain] = profileEmail.split("@");
+  if (!overrides.email) return faker.internet.email();
+  const [local, domain] = overrides.email.split("@");
   const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, "").slice(0, 14);
   return `${local}+test${timestamp}@${domain}`;
 };
 
+const generateFirstName = () => overrides.firstName || faker.person.firstName();
+const generateLastName = () => overrides.lastName || faker.person.lastName();
+const generateFullName = () =>
+  overrides.firstName || overrides.lastName
+    ? `${generateFirstName()} ${generateLastName()}`
+    : faker.person.fullName();
+const generatePassword = () => overrides.password || faker.internet.password();
+
 const autocompleteGenerators: Record<string, () => string> = {
-  "name": () => faker.person.fullName(),
+  "name": () => generateFullName(),
   "honorific-prefix": () => faker.person.prefix(),
-  "given-name": () => faker.person.firstName(),
+  "given-name": () => generateFirstName(),
   "additional-name": () => faker.person.firstName(),
-  "family-name": () => faker.person.lastName(),
+  "family-name": () => generateLastName(),
   "honorific-suffix": () => faker.person.suffix(),
   "nickname": () => faker.internet.username(),
   "username": () => faker.internet.username(),
-  "new-password": () => faker.internet.password(),
-  "current-password": () => faker.internet.password(),
+  "new-password": () => generatePassword(),
+  "current-password": () => generatePassword(),
   "one-time-code": () => faker.string.numeric(6),
   "email": () => generateEmail(),
   "impp": () => faker.internet.url(),
@@ -50,10 +65,10 @@ const autocompleteGenerators: Record<string, () => string> = {
   "postal-code": () => faker.location.zipCode("#####"),
   "country": () => faker.location.countryCode(),
   "country-name": () => faker.location.country(),
-  "cc-name": () => faker.person.fullName(),
-  "cc-given-name": () => faker.person.firstName(),
+  "cc-name": () => generateFullName(),
+  "cc-given-name": () => generateFirstName(),
   "cc-additional-name": () => faker.person.firstName(),
-  "cc-family-name": () => faker.person.lastName(),
+  "cc-family-name": () => generateLastName(),
   "cc-number": () => faker.finance.creditCardNumber(),
   "cc-exp": () => {
     const future = faker.date.future();
@@ -78,7 +93,7 @@ const autocompleteGenerators: Record<string, () => string> = {
 };
 
 export const onExecute = async () => {
-  profileEmail = await chrome.runtime.sendMessage({ type: "getBaseEmail" }).catch(() => null);
+  overrides = await chrome.runtime.sendMessage({ type: "getOverrides" }).catch(() => ({}));
   await fillElements();
   (document.activeElement as HTMLElement | null)?.blur();
   document.querySelector<HTMLElement>("button[type=submit]")?.focus();
@@ -158,7 +173,7 @@ const fillInput = async (input: HTMLInputElement) => {
           .toString(),
       ),
     )
-    .with(Pselector("[type=password]"), (input) => userEvent.type(input, faker.internet.password()))
+    .with(Pselector("[type=password]"), (input) => userEvent.type(input, generatePassword()))
     .with(Pselector("[type=radio]"), async (input) => {
       const allOptions = document.querySelectorAll<HTMLInputElement>(`input[name="${input.name}"]`);
       const isAnyOptionChecked = Array.from(allOptions).some((option) => option.checked);
@@ -211,13 +226,13 @@ const fillInput = async (input: HTMLInputElement) => {
           ),
         )
         .with(Pselector("[name*=first_name], [id*=first_name]"), (input) =>
-          userEvent.type(input, faker.person.firstName()),
+          userEvent.type(input, generateFirstName()),
         )
         .with(Pselector("[name*=last_name], [id*=last_name]"), (input) =>
-          userEvent.type(input, faker.person.lastName()),
+          userEvent.type(input, generateLastName()),
         )
         .with(Pselector("[name*=full_name], [id*=full_name]"), (input) =>
-          userEvent.type(input, faker.person.fullName()),
+          userEvent.type(input, generateFullName()),
         )
         .with(Pselector("[name*=address], [id*=address]"), (input) =>
           userEvent.type(input, faker.location.street()),

@@ -9,13 +9,14 @@ chrome.action.onClicked.addListener(async (tab) => {
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.type === "getBaseEmail") {
-    chrome.storage.sync.get("overrideEmail", (data) => {
-      if (data.overrideEmail) {
-        sendResponse(data.overrideEmail);
+  if (message.type === "getOverrides") {
+    chrome.storage.sync.get("overrides", (data) => {
+      const overrides = data.overrides ?? {};
+      if (overrides.email) {
+        sendResponse(overrides);
       } else {
         chrome.identity.getProfileUserInfo({ accountStatus: "ANY" }, (userInfo) => {
-          sendResponse(userInfo.email || null);
+          sendResponse({ ...overrides, email: userInfo.email || null });
         });
       }
     });
