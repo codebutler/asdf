@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        padding: 16px;
+        min-width: 300px;
+      }
+      label {
+        display: block;
+        font-size: 13px;
+        margin-bottom: 4px;
+        color: #333;
+      }
+      input {
+        width: 100%;
+        padding: 6px 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 13px;
+        box-sizing: border-box;
+      }
+      .hint {
+        font-size: 11px;
+        color: #888;
+        margin-top: 4px;
+      }
+      .status {
+        font-size: 12px;
+        color: #2e7d32;
+        margin-top: 8px;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+    </style>
+  </head>
+  <body>
+    <label for="email">Override email</label>
+    <input type="email" id="email" placeholder="Leave blank to use Chrome profile email" />
+    <div class="hint">Plus-addressed timestamps will be added automatically.</div>
+    <div class="status" id="status">Saved</div>
+    <script type="module" src="options.ts"></script>
+  </body>
+</html>

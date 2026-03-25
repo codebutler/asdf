@@ -8,6 +8,15 @@ const FORM_ELEMENT_SELECTOR = "input, select, textarea, *[role=combobox]";
 
 type FormElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
+let profileEmail: string | null = null;
+
+const generateEmail = (): string => {
+  if (!profileEmail) return faker.internet.email();
+  const [local, domain] = profileEmail.split("@");
+  const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, "").slice(0, 14);
+  return `${local}+test${timestamp}@${domain}`;
+};
+
 const autocompleteGenerators: Record<string, () => string> = {
   "name": () => faker.person.fullName(),
   "honorific-prefix": () => faker.person.prefix(),
@@ -20,7 +29,7 @@ const autocompleteGenerators: Record<string, () => string> = {
   "new-password": () => faker.internet.password(),
   "current-password": () => faker.internet.password(),
   "one-time-code": () => faker.string.numeric(6),
-  "email": () => faker.internet.email(),
+  "email": () => generateEmail(),
   "impp": () => faker.internet.url(),
   "tel": () => faker.phone.number({ style: "national" }),
   "tel-country-code": () => "+1",
@@ -69,6 +78,7 @@ const autocompleteGenerators: Record<string, () => string> = {
 };
 
 export const onExecute = async () => {
+  profileEmail = await chrome.runtime.sendMessage({ type: "getBaseEmail" }).catch(() => null);
   await fillElements();
   (document.activeElement as HTMLElement | null)?.blur();
   document.querySelector<HTMLElement>("button[type=submit]")?.focus();
@@ -135,7 +145,7 @@ const fillInput = async (input: HTMLInputElement) => {
         new Intl.DateTimeFormat(navigator.language).format(faker.date.future()),
       ),
     )
-    .with(Pselector("[type=email]"), (input) => userEvent.type(input, faker.internet.email()))
+    .with(Pselector("[type=email]"), (input) => userEvent.type(input, generateEmail()))
     .with(Pselector("[type=month]"), (input) => userEvent.type(input, faker.date.month()))
     .with(Pselector("[type=number]"), (input) =>
       userEvent.type(
